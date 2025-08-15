@@ -10,8 +10,8 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
 # Copy csproj and restore
-COPY ["DinoSkore.Api/DinoSkore.Api.csproj", "DinoSkore.Api/"]
-RUN dotnet restore "DinoSkore.Api/DinoSkore.Api.csproj"
+COPY ["src/DinoSkore.Api/DinoSkore.Api.csproj", "DinoSkore.Api/"]
+RUN dotnet restore "./src/DinoSkore.Api/DinoSkore.Api.csproj"
 
 # Copy all and publish
 COPY . .
