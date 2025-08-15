@@ -1,4 +1,4 @@
-@DinoSkore.Api_HostAddress = http://localhost:5127
+@DinoSkore.Api_HostAddress = http://localhost:5036
 
 GET {{DinoSkore.Api_HostAddress}}/weatherforecast/
 Accept: application/json
