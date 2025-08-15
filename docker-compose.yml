@@ -1,0 +1,6 @@
+services:
+  dinoskore.api:
+    image: ${DOCKER_REGISTRY-}dinoskoreapi
+    build:
+      context: .
+      dockerfile: DinoSkore.Api/Dockerfile
