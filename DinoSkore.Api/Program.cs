@@ -1,6 +1,7 @@
 using DinoSkore.Api.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.Options;
 using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,23 +12,26 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// Read connection string from environment if on Railway, else use appsettings
-var databaseUrl = Environment.GetEnvironmentVariable("ConnectionStrings__Database")
-                  ?? builder.Configuration.GetConnectionString("Database");
+builder.Services.Configure<DatabaseSettings>(
+    builder.Configuration.GetSection("DatabaseSettings"));
 
-// Convert URL to Npgsql format and add SSL
-var npgsqlBuilder = new NpgsqlConnectionStringBuilder(databaseUrl)
+builder.Services.AddDbContext<AppDbContext>((sp, options) =>
 {
-    SslMode = SslMode.Require
-};
+    var dbSettings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(
-        npgsqlBuilder.ToString(),
-        npgsqlOptions => npgsqlOptions
-            .MigrationsHistoryTable(HistoryRepository.DefaultTableName, Schemas.Application)
-    ).UseSnakeCaseNamingConvention()
-);
+    var npgsqlBuilder = new Npgsql.NpgsqlConnectionStringBuilder
+    {
+        Host = dbSettings.Host,
+        Port = dbSettings.Port,
+        Username = dbSettings.Username,
+        Password = dbSettings.Password,
+        Database = dbSettings.Database,
+        SslMode = dbSettings.UseSsl ? Npgsql.SslMode.Require : Npgsql.SslMode.Disable
+    };
+
+    options.UseNpgsql(npgsqlBuilder.ToString());
+});
+
 
 var app = builder.Build();
 
