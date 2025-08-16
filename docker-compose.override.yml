@@ -1,13 +1,13 @@
 version: "3.9"
 services:
-  db:
+  dinoskore.postgres:
     image: postgres:16
-    container_name: pg-dinoskore
+    container_name: dinoskore-postgres
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: dinoskore_dev
+      POSTGRES_DB: dinoskore
     ports:
       - "5432:5432"
     volumes:
@@ -19,15 +19,15 @@ services:
       dockerfile: Dockerfile
     container_name: dinoskore-api
     depends_on:
-      - db
+      - dinoskore.postgres
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=dinoskore_dev;Username=postgres;Password=postgres"
+      ConnectionStrings__Database: "Host=dinoskore-postgres;Port=5432;Database=dinoskore;Username=postgres;Password=postgres"
     ports:
       - "8080:8080"
       - "8081:8081"
-    volumes:
-      - ./DinoSkore.Api:/app:cached
+    # volumes:
+    #   - ./DinoSkore.Api:/app:cached
 
 volumes:
   postgres_data:
